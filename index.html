@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOTOBOYSSB🚀 - Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #pesquisa-rua {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>MOTOBOYSSB🚀</h1>
+
+  <!-- Formulário de Login -->
+  <div id="login-section">
+    <h2>Login</h2>
+    <form id="login-form">
+      <input type="text" id="username" placeholder="Usuário" required>
+      <input type="password" id="password" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="login-message" style="color: red;"></p>
+  </div>
+
+  <!-- Pesquisa de Rua -->
+  <div id="pesquisa-rua">
+    <h2>Pesquisa de Rua</h2>
+    <input type="text" id="rua-input" placeholder="Digite o nome da rua">
+    <button onclick="pesquisarRua()">Pesquisar</button>
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    // Usuários e senhas
+    const usuarios = {
+      Leonardo: "leo23",
+      Caique: "caique23",
+      Iuri: "iuri23",
+      Riquelme: "riquelme23"
+    };
+
+    // Função de Login
+    document.getElementById("login-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (usuarios[username] && usuarios[username] === password) {
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("pesquisa-rua").style.display = "block";
+      } else {
+        document.getElementById("login-message").textContent = "Usuário ou senha incorretos!";
+      }
+    });
+
+    // Função de Pesquisa
+    async function pesquisarRua() {
+      const rua = document.getElementById("rua-input").value.trim();
+      const resultadoDiv = document.getElementById("resultado");
+
+      if (rua === "") {
+        resultadoDiv.innerHTML = "<p>Por favor, digite uma rua.</p>";
+        return;
+      }
+
+      try {
+        const response = await fetch("ruas.json");
+        const dados = await response.json();
+        const resultado = dados.ruas.find(r => r.nome.toLowerCase() === rua.toLowerCase());
+
+        if (resultado) {
+          resultadoDiv.innerHTML = `
+            <p>Rua: ${resultado.nome}</p>
+            <p>CEP: ${resultado.cep}</p>
+            <p>Endereço Completo: ${resultado.endereco}</p>
+          `;
+        } else {
+          resultadoDiv.innerHTML = "<p>Rua não encontrada.</p>";
+        }
+      } catch (error) {
+        resultadoDiv.innerHTML = "<p>Erro ao buscar os dados.</p>";
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
