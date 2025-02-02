@@ -21,6 +21,7 @@
     #horario-carga, #final-semana-horarios {
       margin-top: 20px;
       font-size: 1.3em;
+      font-weight: bold;
       color: black;
       text-align: left;
       width: 300px;
@@ -30,6 +31,7 @@
     button {
       padding: 12px 25px;
       font-size: 1.1em;
+      font-weight: bold;
       cursor: pointer;
       margin: 15px;
     }
@@ -68,7 +70,6 @@
   <div id="final-semana-horarios"></div>
 
   <script>
-    // Usuários e suas cargas horárias
     const usuarios = {
       Leonardo: {
         senha: "leo23",
@@ -113,7 +114,6 @@ Sábado e Domingo:
 
     let usuarioLogado = "";
 
-    // Função de Login
     document.getElementById("login-form").addEventListener("submit", function (event) {
       event.preventDefault();
       const username = document.getElementById("username").value;
@@ -124,18 +124,15 @@ Sábado e Domingo:
         document.getElementById("login-section").style.display = "none";
         document.getElementById("pesquisa-rua").style.display = "block";
 
-        // Exibe a carga horária do usuário
         document.getElementById("horario-carga").textContent =
           `Olá, ${username}! Sua carga horária é:${usuarios[username].cargaHoraria}`;
 
-        // Exibe o botão para final de semana
         document.getElementById("final-semana-btn").style.display = "block";
       } else {
         document.getElementById("login-message").textContent = "Usuário ou senha incorretos!";
       }
     });
 
-    // Função de Pesquisa
     async function pesquisarRua() {
       const rua = document.getElementById("rua-input").value.trim();
       const resultadoDiv = document.getElementById("resultado");
@@ -165,7 +162,6 @@ Sábado e Domingo:
       }
     }
 
-    // Função para mostrar horários de final de semana
     function mostrarHorariosFinalDeSemana() {
       const finalDeSemanaDiv = document.getElementById("final-semana-horarios");
 
