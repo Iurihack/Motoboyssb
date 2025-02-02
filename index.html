@@ -18,25 +18,23 @@
       display: none;
       margin-top: 20px;
     }
-    #horario-carga {
+    #horario-carga, #final-semana-horarios {
       margin-top: 20px;
-      font-size: 1.2em;
+      font-size: 1.3em;
       color: black;
       text-align: left;
       width: 300px;
       margin: 20px auto;
-    }
-    #final-semana-horarios {
-      display: none;
-      font-size: 1em;
-      color: darkgreen;
-      margin-top: 10px;
+      line-height: 1.8em;
     }
     button {
-      padding: 10px 20px;
-      font-size: 1em;
+      padding: 12px 25px;
+      font-size: 1.1em;
       cursor: pointer;
-      margin: 10px;
+      margin: 15px;
+    }
+    #final-semana-btn {
+      display: none;
     }
   </style>
 </head>
@@ -75,33 +73,41 @@
       Leonardo: {
         senha: "leo23",
         cargaHoraria: `
-          Segunda a Sexta:
-          das 07:00 às 12:00`,
-        finalDeSemana: "Sábado e Domingo: 08:00 às 13:00"
+Segunda a Sexta:
+- 07:00 às 12:00`,
+        finalDeSemana: `
+Sábado e Domingo:
+- 08:00 às 13:00`
       },
       Caique: {
         senha: "caique23",
         cargaHoraria: `
-          Segunda a Sexta:
-          das 08:00 às 13:00`,
-        finalDeSemana: "Sábado: 09:00 às 14:00 | Domingo: 10:00 às 15:00"
+Segunda a Sexta:
+- 08:00 às 13:00`,
+        finalDeSemana: `
+Sábado: 09:00 às 14:00
+Domingo: 10:00 às 15:00`
       },
       Iuri: {
         senha: "iuri23",
         cargaHoraria: `
-          Segunda: 12:00 às 17:00
-          Terça: 12:00 às 17:00
-          Quarta: 12:00 às 17:00
-          Quinta: 12:00 às 17:00
-          Sexta: 12:00 às 17:00`,
-        finalDeSemana: "Sábado: 14:00 às 18:00 | Domingo: Folga"
+Segunda: 12:00 às 17:00
+Terça: 12:00 às 17:00
+Quarta: 12:00 às 17:00
+Quinta: 12:00 às 17:00
+Sexta: 12:00 às 17:00`,
+        finalDeSemana: `
+Sábado: 14:00 às 18:00
+Domingo: Folga`
       },
       Riquelme: {
         senha: "riquelme23",
         cargaHoraria: `
-          Segunda a Sexta:
-          das 17:00 às 23:00`,
-        finalDeSemana: "Sábado e Domingo: 18:00 às 22:00"
+Segunda a Sexta:
+- 17:00 às 23:00`,
+        finalDeSemana: `
+Sábado e Domingo:
+- 18:00 às 22:00`
       }
     };
 
@@ -120,7 +126,10 @@
 
         // Exibe a carga horária do usuário
         document.getElementById("horario-carga").textContent =
-          `Olá, ${username}! Sua carga horária é: ${usuarios[username].cargaHoraria}`;
+          `Olá, ${username}! Sua carga horária é:${usuarios[username].cargaHoraria}`;
+
+        // Exibe o botão para final de semana
+        document.getElementById("final-semana-btn").style.display = "block";
       } else {
         document.getElementById("login-message").textContent = "Usuário ou senha incorretos!";
       }
@@ -162,7 +171,7 @@
 
       if (usuarioLogado && usuarios[usuarioLogado]) {
         finalDeSemanaDiv.style.display = "block";
-        finalDeSemanaDiv.textContent = `Horários de Final de Semana: ${usuarios[usuarioLogado].finalDeSemana}`;
+        finalDeSemanaDiv.textContent = `Horários de Final de Semana:${usuarios[usuarioLogado].finalDeSemana}`;
       }
     }
   </script>
