@@ -1,0 +1,19 @@
+{
+  "ruas": [
+    {
+      "nome": "Rua das Flores",
+      "cep": "12345-678",
+      "endereco": "Bairro das Rosas, Cidade das Árvores"
+    },
+    {
+      "nome": "Avenida Central",
+      "cep": "98765-432",
+      "endereco": "Centro, Cidade do Sol"
+    },
+    {
+      "nome": "Rua da Paz",
+      "cep": "11223-445",
+      "endereco": "Bairro Tranquilo, Cidade Harmonia"
+    }
+  ]
+}
