@@ -6,13 +6,13 @@
   <title>MOTOBOYSSB🚀 - Login</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
       padding: 20px;
       background-image: url('https://i.ibb.co/27w5GR9P/e3889374523f6401f87b38223af97dd7.jpg');
       background-size: cover;
       background-position: center;
-      color: white;
+      color: black;
     }
     #pesquisa-rua {
       display: none;
@@ -21,7 +21,22 @@
     #horario-carga {
       margin-top: 20px;
       font-size: 1.2em;
-      color: lightblue;
+      color: black;
+      text-align: left;
+      width: 300px;
+      margin: 20px auto;
+    }
+    #final-semana-horarios {
+      display: none;
+      font-size: 1em;
+      color: darkgreen;
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      margin: 10px;
     }
   </style>
 </head>
@@ -50,26 +65,47 @@
   <!-- Exibição da Carga Horária -->
   <div id="horario-carga"></div>
 
+  <!-- Botão e Horários de Final de Semana -->
+  <button id="final-semana-btn" onclick="mostrarHorariosFinalDeSemana()">Final de Semana</button>
+  <div id="final-semana-horarios"></div>
+
   <script>
-    // Usuários e senhas com carga horária
+    // Usuários e suas cargas horárias
     const usuarios = {
       Leonardo: {
         senha: "leo23",
-        cargaHoraria: "Segunda a Sexta: 07:00 às 12:00PM"
+        cargaHoraria: `
+          Segunda a Sexta:
+          das 07:00 às 12:00`,
+        finalDeSemana: "Sábado e Domingo: 08:00 às 13:00"
       },
       Caique: {
         senha: "caique23",
-        cargaHoraria: "Segunda a Sexta: 08:00 às 13:00PM"
+        cargaHoraria: `
+          Segunda a Sexta:
+          das 08:00 às 13:00`,
+        finalDeSemana: "Sábado: 09:00 às 14:00 | Domingo: 10:00 às 15:00"
       },
       Iuri: {
         senha: "iuri23",
-        cargaHoraria: "Segunda a Sexta: 09:00 às 14:00PM"
+        cargaHoraria: `
+          Segunda: 12:00 às 17:00
+          Terça: 12:00 às 17:00
+          Quarta: 12:00 às 17:00
+          Quinta: 12:00 às 17:00
+          Sexta: 12:00 às 17:00`,
+        finalDeSemana: "Sábado: 14:00 às 18:00 | Domingo: Folga"
       },
       Riquelme: {
         senha: "riquelme23",
-        cargaHoraria: "Segunda a Sexta: 06:00 às 11:00PM"
+        cargaHoraria: `
+          Segunda a Sexta:
+          das 17:00 às 23:00`,
+        finalDeSemana: "Sábado e Domingo: 18:00 às 22:00"
       }
     };
+
+    let usuarioLogado = "";
 
     // Função de Login
     document.getElementById("login-form").addEventListener("submit", function (event) {
@@ -78,6 +114,7 @@
       const password = document.getElementById("password").value;
 
       if (usuarios[username] && usuarios[username].senha === password) {
+        usuarioLogado = username;
         document.getElementById("login-section").style.display = "none";
         document.getElementById("pesquisa-rua").style.display = "block";
 
@@ -116,6 +153,16 @@
       } catch (error) {
         resultadoDiv.innerHTML = "<p>Erro ao buscar os dados.</p>";
         console.error(error);
+      }
+    }
+
+    // Função para mostrar horários de final de semana
+    function mostrarHorariosFinalDeSemana() {
+      const finalDeSemanaDiv = document.getElementById("final-semana-horarios");
+
+      if (usuarioLogado && usuarios[usuarioLogado]) {
+        finalDeSemanaDiv.style.display = "block";
+        finalDeSemanaDiv.textContent = `Horários de Final de Semana: ${usuarios[usuarioLogado].finalDeSemana}`;
       }
     }
   </script>
