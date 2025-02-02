@@ -18,6 +18,11 @@
       display: none;
       margin-top: 20px;
     }
+    #horario-carga {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: lightblue;
+    }
   </style>
 </head>
 <body>
@@ -42,13 +47,28 @@
     <div id="resultado"></div>
   </div>
 
+  <!-- Exibição da Carga Horária -->
+  <div id="horario-carga"></div>
+
   <script>
-    // Usuários e senhas
+    // Usuários e senhas com carga horária
     const usuarios = {
-      Leonardo: "leo23",
-      Caique: "caique23",
-      Iuri: "iuri23",
-      Riquelme: "riquelme23"
+      Leonardo: {
+        senha: "leo23",
+        cargaHoraria: "Segunda a Sexta: 07:00 às 12:00PM"
+      },
+      Caique: {
+        senha: "caique23",
+        cargaHoraria: "Segunda a Sexta: 08:00 às 13:00PM"
+      },
+      Iuri: {
+        senha: "iuri23",
+        cargaHoraria: "Segunda a Sexta: 09:00 às 14:00PM"
+      },
+      Riquelme: {
+        senha: "riquelme23",
+        cargaHoraria: "Segunda a Sexta: 06:00 às 11:00PM"
+      }
     };
 
     // Função de Login
@@ -57,9 +77,13 @@
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
 
-      if (usuarios[username] && usuarios[username] === password) {
+      if (usuarios[username] && usuarios[username].senha === password) {
         document.getElementById("login-section").style.display = "none";
         document.getElementById("pesquisa-rua").style.display = "block";
+
+        // Exibe a carga horária do usuário
+        document.getElementById("horario-carga").textContent =
+          `Olá, ${username}! Sua carga horária é: ${usuarios[username].cargaHoraria}`;
       } else {
         document.getElementById("login-message").textContent = "Usuário ou senha incorretos!";
       }
