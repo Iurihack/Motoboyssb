@@ -15,6 +15,7 @@
       padding: 20px;
       background-image: url('https://i.ibb.co/1fwPfvDm/IMG-20250127-WA0016.jpg');
       background-size: cover;
+      background-repeat: no-repeat;
       background-position: center;
       color: black;
     }
@@ -54,6 +55,12 @@
     #final-semana-btn {
       display: none;
     }
+    #welcome-message {
+      font-size: 1.5em;
+      color: green;
+      margin-top: 20px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -73,6 +80,7 @@
   <!-- Pesquisa de Rua -->
   <div id="pesquisa-rua">
     <h2>Pesquisa de Rua</h2>
+    <p id="welcome-message"></p>
     <input type="text" id="rua-input" placeholder="Digite o nome da rua">
     <button onclick="pesquisarRua()">Pesquisar</button>
     <div id="resultado"></div>
@@ -87,54 +95,11 @@
 
   <script>
     const usuarios = {
-      Leonardo: {
-        senha: "leo23",
-        cargaHoraria: `
-Segunda a Sexta:
-- 07:00 às 12:00`,
-        finalDeSemana: `
-Sábado e Domingo:
-- 08:00 às 13:00`
-      },
-      Caique: {
-        senha: "caique23",
-        cargaHoraria: `
-Segunda a Sexta:
-- 08:00 às 13:00`,
-        finalDeSemana: `
-Sábado: 09:00 às 14:00
-Domingo: 10:00 às 15:00`
-      },
-      Iuri: {
-        senha: "iuri23",
-        cargaHoraria: `
-Segunda: 12:00 às 17:00
-Terça: 12:00 às 17:00
-Quarta: 12:00 às 17:00
-Quinta: 12:00 às 17:00
-Sexta: 12:00 às 17:00`,
-        finalDeSemana: `
-Sábado: 14:00 às 18:00
-Domingo: Folga`
-      },
-      Riquelme: {
-        senha: "riquelme23",
-        cargaHoraria: `
-Segunda a Sexta:
-- 17:00 às 23:00`,
-        finalDeSemana: `
-Sábado e Domingo:
-- 18:00 às 22:00`
-      },
-      Luis: {
-        senha: "luis23",
-        cargaHoraria: `
-Segunda a Sexta:
-- 09:00 às 14:00`,
-        finalDeSemana: `
-Sábado e Domingo:
-- 10:00 às 15:00`
-      }
+      Leonardo: { senha: "leo23" },
+      Caique: { senha: "caique23" },
+      Iuri: { senha: "iuri23" },
+      Riquelme: { senha: "riquelme23" },
+      Luis: { senha: "luis23" }
     };
 
     let usuarioLogado = "";
@@ -149,25 +114,12 @@ Sábado e Domingo:
         document.getElementById("login-section").style.display = "none";
         document.getElementById("pesquisa-rua").style.display = "block";
 
-        exibirCargaHoraria(username);
-
-        document.getElementById("final-semana-btn").style.display = "block";
-
-        // Mensagem de boas-vindas personalizada
-        alert(`Salvee, ${username}!`);
+        // Exibe a mensagem de boas-vindas
+        document.getElementById("welcome-message").textContent = `Salvee, ${username}!`;
       } else {
         document.getElementById("login-message").textContent = "Usuário ou senha incorretos!";
       }
     });
-
-    function exibirCargaHoraria(username) {
-      const cargaHorariaDiv = document.getElementById("horario-carga");
-      cargaHorariaDiv.innerHTML = `
-        <div class="carga-box">
-          <h3>Olá, ${username}!</h3>
-          <p>${usuarios[username].cargaHoraria}</p>
-        </div>`;
-    }
 
     async function pesquisarRua() {
       const rua = document.getElementById("rua-input").value.trim();
@@ -195,233 +147,6 @@ Sábado e Domingo:
       } catch (error) {
         resultadoDiv.innerHTML = "<p>Erro ao buscar os dados.</p>";
         console.error(error);
-      }
-    }
-
-    function mostrarHorariosFinalDeSemana() {
-      const finalDeSemanaDiv = document.getElementById("final-semana-horarios");
-
-      if (usuarioLogado && usuarios[usuarioLogado]) {
-        finalDeSemanaDiv.style.display = "block";
-        finalDeSemanaDiv.innerHTML = `
-          <div class="carga-box">
-            <h3>Horários de Final de Semana:</h3>
-            <p>${usuarios[usuarioLogado].finalDeSemana}</p>
-          </div>`;
-      }
-    }
-  </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MOTOBOYSSB🚀 - Login</title>
-
-  <!-- Importação da Fonte Roboto -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      text-align: center;
-      padding: 20px;
-      background-image: url('https://i.ibb.co/1fwPfvDm/IMG-20250127-WA0016.jpg');
-      background-size: cover;
-      background-position: center;
-      color: black;
-    }
-    #pesquisa-rua {
-      display: none;
-      margin-top: 20px;
-    }
-    #horario-carga, #final-semana-horarios {
-      margin-top: 20px;
-      text-align: left;
-      width: 300px;
-      margin: 20px auto;
-      line-height: 1.8em;
-    }
-    .carga-box {
-      background-color: white;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 10px;
-      font-size: 1.2em;
-      font-weight: bold;
-      color: black;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    }
-    button {
-      padding: 12px 25px;
-      font-size: 1.1em;
-      font-weight: bold;
-      cursor: pointer;
-      margin: 15px;
-      font-family: 'Roboto', sans-serif;
-      color: white;
-      background-color: #28a745;
-      border: none;
-      border-radius: 5px;
-    }
-    #final-semana-btn {
-      display: none;
-    }
-  </style>
-</head>
-<body>
-  <h1>MOTOBOYSSB🚀</h1>
-
-  <!-- Formulário de Login -->
-  <div id="login-section">
-    <h2>Login</h2>
-    <form id="login-form">
-      <input type="text" id="username" placeholder="Usuário" required>
-      <input type="password" id="password" placeholder="Senha" required>
-      <button type="submit">Entrar</button>
-    </form>
-    <p id="login-message" style="color: red;"></p>
-  </div>
-
-  <!-- Pesquisa de Rua -->
-  <div id="pesquisa-rua">
-    <h2>Pesquisa de Rua</h2>
-    <input type="text" id="rua-input" placeholder="Digite o nome da rua">
-    <button onclick="pesquisarRua()">Pesquisar</button>
-    <div id="resultado"></div>
-  </div>
-
-  <!-- Exibição da Carga Horária -->
-  <div id="horario-carga"></div>
-
-  <!-- Botão e Horários de Final de Semana -->
-  <button id="final-semana-btn" onclick="mostrarHorariosFinalDeSemana()">Final de Semana</button>
-  <div id="final-semana-horarios"></div>
-
-  <script>
-    const usuarios = {
-      Leonardo: {
-        senha: "leo23",
-        cargaHoraria: `
-Segunda a Sexta:
-- 07:00 às 12:00`,
-        finalDeSemana: `
-Sábado e Domingo:
-- 08:00 às 13:00`
-      },
-      Caique: {
-        senha: "caique23",
-        cargaHoraria: `
-Segunda a Sexta:
-- 08:00 às 13:00`,
-        finalDeSemana: `
-Sábado: 09:00 às 14:00
-Domingo: 10:00 às 15:00`
-      },
-      Iuri: {
-        senha: "iuri23",
-        cargaHoraria: `
-Segunda: 12:00 às 17:00
-Terça: 12:00 às 17:00
-Quarta: 12:00 às 17:00
-Quinta: 12:00 às 17:00
-Sexta: 12:00 às 17:00`,
-        finalDeSemana: `
-Sábado: 14:00 às 18:00
-Domingo: Folga`
-      },
-      Riquelme: {
-        senha: "riquelme23",
-        cargaHoraria: `
-Segunda a Sexta:
-- 17:00 às 23:00`,
-        finalDeSemana: `
-Sábado e Domingo:
-- 18:00 às 22:00`
-      },
-      Luis: {
-        senha: "luis23",
-        cargaHoraria: `
-Segunda a Sexta:
-- 09:00 às 14:00`,
-        finalDeSemana: `
-Sábado e Domingo:
-- 10:00 às 15:00`
-      }
-    };
-
-    let usuarioLogado = "";
-
-    document.getElementById("login-form").addEventListener("submit", function (event) {
-      event.preventDefault();
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-
-      if (usuarios[username] && usuarios[username].senha === password) {
-        usuarioLogado = username;
-        document.getElementById("login-section").style.display = "none";
-        document.getElementById("pesquisa-rua").style.display = "block";
-
-        exibirCargaHoraria(username);
-
-        document.getElementById("final-semana-btn").style.display = "block";
-
-        // Mensagem de boas-vindas personalizada
-        alert(`Salvee, ${username}!`);
-      } else {
-        document.getElementById("login-message").textContent = "Usuário ou senha incorretos!";
-      }
-    });
-
-    function exibirCargaHoraria(username) {
-      const cargaHorariaDiv = document.getElementById("horario-carga");
-      cargaHorariaDiv.innerHTML = `
-        <div class="carga-box">
-          <h3>Olá, ${username}!</h3>
-          <p>${usuarios[username].cargaHoraria}</p>
-        </div>`;
-    }
-
-    async function pesquisarRua() {
-      const rua = document.getElementById("rua-input").value.trim();
-      const resultadoDiv = document.getElementById("resultado");
-
-      if (rua === "") {
-        resultadoDiv.innerHTML = "<p>Por favor, digite uma rua.</p>";
-        return;
-      }
-
-      try {
-        const response = await fetch("ruas.json");
-        const dados = await response.json();
-        const resultado = dados.ruas.find(r => r.nome.toLowerCase() === rua.toLowerCase());
-
-        if (resultado) {
-          resultadoDiv.innerHTML = `
-            <p>Rua: ${resultado.nome}</p>
-            <p>CEP: ${resultado.cep}</p>
-            <p>Endereço Completo: ${resultado.endereco}</p>
-          `;
-        } else {
-          resultadoDiv.innerHTML = "<p>Rua não encontrada.</p>";
-        }
-      } catch (error) {
-        resultadoDiv.innerHTML = "<p>Erro ao buscar os dados.</p>";
-        console.error(error);
-      }
-    }
-
-    function mostrarHorariosFinalDeSemana() {
-      const finalDeSemanaDiv = document.getElementById("final-semana-horarios");
-
-      if (usuarioLogado && usuarios[usuarioLogado]) {
-        finalDeSemanaDiv.style.display = "block";
-        finalDeSemanaDiv.innerHTML = `
-          <div class="carga-box">
-            <h3>Horários de Final de Semana:</h3>
-            <p>${usuarios[usuarioLogado].finalDeSemana}</p>
-          </div>`;
       }
     }
   </script>
