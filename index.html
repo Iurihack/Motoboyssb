@@ -15,7 +15,6 @@
       padding: 20px;
       background-image: url('https://i.ibb.co/1fwPfvDm/IMG-20250127-WA0016.jpg');
       background-size: cover;
-      background-repeat: no-repeat;
       background-position: center;
       color: black;
     }
@@ -81,13 +80,11 @@
   <div id="pesquisa-rua">
     <h2>Pesquisa de Rua</h2>
     <p id="welcome-message"></p>
+    <div id="horario-carga"></div>
     <input type="text" id="rua-input" placeholder="Digite o nome da rua">
     <button onclick="pesquisarRua()">Pesquisar</button>
     <div id="resultado"></div>
   </div>
-
-  <!-- Exibição da Carga Horária -->
-  <div id="horario-carga"></div>
 
   <!-- Botão e Horários de Final de Semana -->
   <button id="final-semana-btn" onclick="mostrarHorariosFinalDeSemana()">Final de Semana</button>
@@ -95,11 +92,11 @@
 
   <script>
     const usuarios = {
-      Leonardo: { senha: "leo23" },
-      Caique: { senha: "caique23" },
-      Iuri: { senha: "iuri23" },
-      Riquelme: { senha: "riquelme23" },
-      Luis: { senha: "luis23" }
+      Leonardo: { senha: "leo23", carga: "Segunda a Sexta: 07:00 às 12:00" },
+      Caique: { senha: "caique23", carga: "Segunda a Sexta: 08:00 às 13:00" },
+      Iuri: { senha: "iuri23", carga: "Segunda a Sexta: 12:00 às 17:00" },
+      Riquelme: { senha: "riquelme23", carga: "Segunda a Sexta: 17:00 às 23:00" },
+      Luis: { senha: "luis23", carga: "Segunda a Sexta: 09:00 às 14:00" }
     };
 
     let usuarioLogado = "";
@@ -114,12 +111,21 @@
         document.getElementById("login-section").style.display = "none";
         document.getElementById("pesquisa-rua").style.display = "block";
 
-        // Exibe a mensagem de boas-vindas
+        // Exibe a mensagem de boas-vindas e carga horária
         document.getElementById("welcome-message").textContent = `Salvee, ${username}!`;
+        exibirCargaHoraria(username);
       } else {
         document.getElementById("login-message").textContent = "Usuário ou senha incorretos!";
       }
     });
+
+    function exibirCargaHoraria(username) {
+      const cargaHorariaDiv = document.getElementById("horario-carga");
+      cargaHorariaDiv.innerHTML = `
+        <div class="carga-box">
+          <p>Carga Horária: ${usuarios[username].carga}</p>
+        </div>`;
+    }
 
     async function pesquisarRua() {
       const rua = document.getElementById("rua-input").value.trim();
