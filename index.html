@@ -1,160 +1,51 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MOTOBOYSSB🚀 - Login</title>
-
-  <!-- Importação da Fonte Roboto -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      text-align: center;
-      padding: 20px;
-      background-image: url('https://i.ibb.co/1fwPfvDm/IMG-20250127-WA0016.jpg');
-      background-size: cover;
-      background-position: center;
-      color: black;
-    }
-    #pesquisa-rua {
-      display: none;
-      margin-top: 20px;
-    }
-    #horario-carga, #final-semana-horarios {
-      margin-top: 20px;
-      text-align: left;
-      width: 300px;
-      margin: 20px auto;
-      line-height: 1.8em;
-    }
-    .carga-box {
-      background-color: white;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 10px;
-      font-size: 1.2em;
-      font-weight: bold;
-      color: black;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    }
-    button {
-      padding: 12px 25px;
-      font-size: 1.1em;
-      font-weight: bold;
-      cursor: pointer;
-      margin: 15px;
-      font-family: 'Roboto', sans-serif;
-      color: white;
-      background-color: #28a745;
-      border: none;
-      border-radius: 5px;
-    }
-    #final-semana-btn {
-      display: none;
-    }
-    #welcome-message {
-      font-size: 1.5em;
-      color: green;
-      margin-top: 20px;
-      font-weight: bold;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login do Comprador</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+        input, button { width: 90%; padding: 10px; margin: 5px; }
+    </style>
 </head>
 <body>
-  <h1>MOTOBOYSSB🚀</h1>
 
-  <!-- Formulário de Login -->
-  <div id="login-section">
-    <h2>Login</h2>
-    <form id="login-form">
-      <input type="text" id="username" placeholder="Usuário" required>
-      <input type="password" id="password" placeholder="Senha" required>
-      <button type="submit">Entrar</button>
-    </form>
-    <p id="login-message" style="color: red;"></p>
-  </div>
+    <div class="container">
+        <h2>Entrar ou Registrar</h2>
+        <input type="text" id="username" placeholder="Nome de usuário" required>
+        <input type="password" id="password" placeholder="Senha" required>
+        <button onclick="registrar()">Registrar</button>
+        <button onclick="entrar()">Entrar</button>
+        <p id="mensagem"></p>
+    </div>
 
-  <!-- Pesquisa de Rua -->
-  <div id="pesquisa-rua">
-    <h2>Pesquisa de Rua</h2>
-    <p id="welcome-message"></p>
-    <div id="horario-carga"></div>
-    <input type="text" id="rua-input" placeholder="Digite o nome da rua">
-    <button onclick="pesquisarRua()">Pesquisar</button>
-    <div id="resultado"></div>
-  </div>
+    <script>
+        function registrar() {
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
 
-  <!-- Botão e Horários de Final de Semana -->
-  <button id="final-semana-btn" onclick="mostrarHorariosFinalDeSemana()">Final de Semana</button>
-  <div id="final-semana-horarios"></div>
-
-  <script>
-    const usuarios = {
-      Leonardo: { senha: "leo23", carga: "Segunda a Sexta: 07:00 às 12:00" },
-      Caique: { senha: "caique23", carga: "Segunda a Sexta: 08:00 às 13:00" },
-      Iuri: { senha: "iuri23", carga: "Segunda a Sexta: 12:00 às 17:00" },
-      Riquelme: { senha: "riquelme23", carga: "Segunda a Sexta: 17:00 às 23:00" },
-      Luis: { senha: "luis23", carga: "Segunda a Sexta: 09:00 às 14:00" }
-    };
-
-    let usuarioLogado = "";
-
-    document.getElementById("login-form").addEventListener("submit", function (event) {
-      event.preventDefault();
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-
-      if (usuarios[username] && usuarios[username].senha === password) {
-        usuarioLogado = username;
-        document.getElementById("login-section").style.display = "none";
-        document.getElementById("pesquisa-rua").style.display = "block";
-
-        // Exibe a mensagem de boas-vindas e carga horária
-        document.getElementById("welcome-message").textContent = `Salvee, ${username}!`;
-        exibirCargaHoraria(username);
-      } else {
-        document.getElementById("login-message").textContent = "Usuário ou senha incorretos!";
-      }
-    });
-
-    function exibirCargaHoraria(username) {
-      const cargaHorariaDiv = document.getElementById("horario-carga");
-      cargaHorariaDiv.innerHTML = `
-        <div class="carga-box">
-          <p>Carga Horária: ${usuarios[username].carga}</p>
-        </div>`;
-    }
-
-    async function pesquisarRua() {
-      const rua = document.getElementById("rua-input").value.trim();
-      const resultadoDiv = document.getElementById("resultado");
-
-      if (rua === "") {
-        resultadoDiv.innerHTML = "<p>Por favor, digite uma rua.</p>";
-        return;
-      }
-
-      try {
-        const response = await fetch("ruas.json");
-        const dados = await response.json();
-        const resultado = dados.ruas.find(r => r.nome.toLowerCase() === rua.toLowerCase());
-
-        if (resultado) {
-          resultadoDiv.innerHTML = `
-            <p>Rua: ${resultado.nome}</p>
-            <p>CEP: ${resultado.cep}</p>
-            <p>Endereço Completo: ${resultado.endereco}</p>
-          `;
-        } else {
-          resultadoDiv.innerHTML = "<p>Rua não encontrada.</p>";
+            if (username && password) {
+                localStorage.setItem(username, password);
+                document.getElementById("mensagem").innerText = "✅ Registro concluído!";
+            } else {
+                document.getElementById("mensagem").innerText = "❌ Preencha todos os campos!";
+            }
         }
-      } catch (error) {
-        resultadoDiv.innerHTML = "<p>Erro ao buscar os dados.</p>";
-        console.error(error);
-      }
-    }
-  </script>
+
+        function entrar() {
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+
+            if (localStorage.getItem(username) === password) {
+                sessionStorage.setItem("user", username);
+                window.location.href = "painel.html";
+            } else {
+                document.getElementById("mensagem").innerText = "❌ Usuário ou senha inválidos!";
+            }
+        }
+    </script>
+
 </body>
 </html>
