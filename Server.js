@@ -8,19 +8,31 @@ const PORT = 3000;
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
 
-let submissions = {}; // salva usuários que enviaram no dia
+const users = {
+  "admin": "adminsb",
+  "Caique": "caiquesb",
+  "Iuri": "iurisb",
+  "Riquelme": "riquelmesb",
+  "Leonardo": "leonardosb"
+};
+
+let submissions = {};
 
 app.post('/checklist', (req, res) => {
-  const data = req.body;
-  const key = `${data.usuario}-${data.data}`;
+  const { usuario, senha, moto, data, hora, checklist } = req.body;
 
-  if (submissions[key]) {
+  if (!users[usuario] || users[usuario] !== senha) {
+    return res.status(401).json({ message: 'Usuário ou senha inválidos.' });
+  }
+
+  const key = `${usuario}-${data}`;
+  if (submissions[key] && usuario !== "admin") {
     return res.status(400).json({ message: 'Checklist já enviado hoje.' });
   }
 
-  submissions[key] = true;
+  if (usuario !== "admin") submissions[key] = true;
 
-  const texto = `Usuário: ${data.usuario}\nMoto: ${data.moto}\nData: ${data.data}\nHora: ${data.hora}\n\nChecklist:\n${data.checklist.join('\n')}\n\n---\n`;
+  const texto = `Usuário: ${usuario}\nMoto: ${moto}\nData: ${data}\nHora: ${hora}\n\nChecklist:\n${checklist.join('\n')}\n\n---\n`;
 
   const filePath = path.join(__dirname, 'logui2.txt');
   fs.appendFile(filePath, texto, (err) => {
