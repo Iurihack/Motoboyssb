@@ -4,34 +4,76 @@
   <meta charset="UTF-8">
   <title>Checklist Pop 110</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    .hidden { display: none; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    input, select, button {
+      font-size: 20px;
+      padding: 12px;
+      margin: 8px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    label {
+      font-size: 20px;
+      margin-top: 10px;
+      display: block;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
 
 <div id="login">
   <h2>Login</h2>
-  <input type="text" id="username" placeholder="Usuário"><br>
-  <input type="password" id="password" placeholder="Senha"><br><br>
+  <input type="text" id="username" placeholder="Usuário">
+  <input type="password" id="password" placeholder="Senha">
   <button onclick="login()">Entrar</button>
 </div>
 
 <div id="formulario" class="hidden">
   <h2>Checklist Pop 110</h2>
-  <label>Moto:</label>
+
+  <label for="motoSelect">Moto:</label>
   <select id="motoSelect">
     <option value="Moto 1">Moto 1</option>
     <option value="Moto 2">Moto 2</option>
-  </select><br><br>
-  <label>Data:</label>
-  <input type="date" id="data"><br><br>
-  <label>Hora:</label>
-  <input type="time" id="hora"><br><br>
+  </select>
+
+  <label for="data">Data:</label>
+  <input type="date" id="data">
+
+  <label for="hora">Hora:</label>
+  <input type="time" id="hora">
 
   <form id="checklistForm">
-    <div id="checklistItems"></div><br>
-    <button type="submit">Enviar</button>
+    <div id="checklistItems"></div>
+    <button type="submit">Enviar Checklist</button>
   </form>
 </div>
 
