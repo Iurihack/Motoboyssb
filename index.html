@@ -12,7 +12,6 @@
     button { background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
     button:hover { background: #218838; }
     .hidden { display: none; }
-    .checklist label { display: block; margin: 5px 0; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     th { background-color: #eee; }
@@ -33,29 +32,26 @@
       <option value="Moto 1">Moto 1</option>
       <option value="Moto 2">Moto 2</option>
     </select>
+    <label>Data:</label>
+    <input type="date" id="dataChecklist" required />
+    <label>Hora:</label>
+    <input type="time" id="horaChecklist" required />
     <button onclick="confirmarMoto()">Confirmar</button>
   </div>
 
   <div class="container hidden" id="checklistContainer">
-    <h2>Checklist de Motos</h2>
+    <h2>Checklist - Pop 110</h2>
     <div id="userHeader"></div>
     <form id="checklistForm">
-      <label><input type="checkbox" name="moto1" value="óleo" /> Óleo - Moto 1</label>
-      <label><input type="checkbox" name="moto1" value="freios" /> Freios - Moto 1</label>
-      <label><input type="checkbox" name="moto2" value="óleo" /> Óleo - Moto 2</label>
-      <label><input type="checkbox" name="moto2" value="freios" /> Freios - Moto 2</label>
-
-      <h3>Checklist Geral - Pop 110</h3>
-      <label><input type="checkbox" name="pop110" value="óleo_motor" /> Óleo do motor</label>
-      <label><input type="checkbox" name="pop110" value="pneu_dianteiro" /> Pneu dianteiro</label>
-      <label><input type="checkbox" name="pop110" value="pneu_traseiro" /> Pneu traseiro</label>
-      <label><input type="checkbox" name="pop110" value="freios" /> Sistema de freios</label>
-      <label><input type="checkbox" name="pop110" value="corrente" /> Corrente de transmissão</label>
-      <label><input type="checkbox" name="pop110" value="luzes" /> Luzes (farol, lanterna, setas)</label>
-      <label><input type="checkbox" name="pop110" value="buzina" /> Buzina</label>
-      <label><input type="checkbox" name="pop110" value="retrovisores" /> Retrovisores</label>
-      <label><input type="checkbox" name="pop110" value="painel" /> Painel de instrumentos</label>
-
+      <label><input type="checkbox" value="óleo_motor" /> Óleo do motor</label>
+      <label><input type="checkbox" value="pneu_dianteiro" /> Pneu dianteiro</label>
+      <label><input type="checkbox" value="pneu_traseiro" /> Pneu traseiro</label>
+      <label><input type="checkbox" value="freios" /> Sistema de freios</label>
+      <label><input type="checkbox" value="corrente" /> Corrente de transmissão</label>
+      <label><input type="checkbox" value="luzes" /> Luzes (farol, lanterna, setas)</label>
+      <label><input type="checkbox" value="buzina" /> Buzina</label>
+      <label><input type="checkbox" value="retrovisores" /> Retrovisores</label>
+      <label><input type="checkbox" value="painel" /> Painel de instrumentos</label>
       <button type="submit">Salvar Checklist</button>
     </form>
     <div id="adminView" class="hidden"></div>
@@ -72,20 +68,27 @@
 
     let usuarioLogado = "";
     let motoSelecionada = "";
+    let dataSelecionada = "";
+    let horaSelecionada = "";
 
     function login() {
-      const usernameInput = document.getElementById('username').value.trim().toLowerCase();
-      const passwordInput = document.getElementById('password').value.trim().toLowerCase();
+      const username = document.getElementById('username').value.trim().toLowerCase();
+      const password = document.getElementById('password').value.trim().toLowerCase();
 
-      if (users[usernameInput] && users[usernameInput].password === passwordInput) {
-        usuarioLogado = usernameInput;
+      if (users[username] && users[username].password === password) {
+        usuarioLogado = username;
         document.getElementById('loginContainer').classList.add('hidden');
 
-        if (users[usernameInput].isAdmin) {
+        if (users[username].isAdmin) {
           document.getElementById('checklistContainer').classList.remove('hidden');
           document.getElementById('userHeader').innerText = `Admin: ${usuarioLogado}`;
           exibirAdminView();
         } else {
+          if (verificarChecklistEnviadoHoje(usuarioLogado)) {
+            alert("Você já enviou o checklist hoje. Tente novamente amanhã.");
+            location.reload();
+            return;
+          }
           document.getElementById('motoSelectContainer').classList.remove('hidden');
         }
       } else {
@@ -93,39 +96,58 @@
       }
     }
 
-    function confirmarMoto() {
-      const select = document.getElementById('motoSelecionada');
-      motoSelecionada = select.value;
+    function verificarChecklistEnviadoHoje(usuario) {
+      const hoje = new Date().toISOString().split("T")[0];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('checklist_')) {
+          const item = JSON.parse(localStorage.getItem(key));
+          if (item.usuario === usuario && item.data === hoje) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
 
-      if (!motoSelecionada) {
-        alert('Selecione uma moto antes de continuar.');
+    function confirmarMoto() {
+      motoSelecionada = document.getElementById('motoSelecionada').value;
+      dataSelecionada = document.getElementById('dataChecklist').value;
+      horaSelecionada = document.getElementById('horaChecklist').value;
+
+      if (!motoSelecionada || !dataSelecionada || !horaSelecionada) {
+        alert("Preencha todos os campos antes de continuar.");
         return;
       }
 
       document.getElementById('motoSelectContainer').classList.add('hidden');
       document.getElementById('checklistContainer').classList.remove('hidden');
-      document.getElementById('userHeader').innerText = `Usuário: ${usuarioLogado} - ${motoSelecionada}`;
+      document.getElementById('userHeader').innerText = `Usuário: ${usuarioLogado} - ${motoSelecionada} - ${dataSelecionada} ${horaSelecionada}`;
 
       document.getElementById('checklistForm').onsubmit = function(e) {
         e.preventDefault();
-        salvarChecklist(usuarioLogado, motoSelecionada);
+        salvarChecklist(usuarioLogado, motoSelecionada, dataSelecionada, horaSelecionada);
       };
     }
 
-    function salvarChecklist(usuario, moto) {
+    function salvarChecklist(usuario, moto, data, hora) {
       const checkboxes = document.querySelectorAll('#checklistForm input[type="checkbox"]');
       const selecionados = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-      const agora = new Date();
-      const data = {
+      const dataHora = `${data} ${hora}`;
+      const chave = `checklist_${usuario}_${data}`;
+
+      const checklist = {
         usuario,
         moto,
-        selecionados,
-        dataHora: agora.toLocaleString()
+        data,
+        hora,
+        dataHora,
+        selecionados
       };
-      const chave = `checklist_${agora.getFullYear()}_${(agora.getMonth()+1).toString().padStart(2,'0')}_${agora.getDate().toString().padStart(2,'0')}_${agora.getHours()}h${agora.getMinutes()}m`;
-      localStorage.setItem(chave, JSON.stringify(data));
-      alert('Checklist salvo com sucesso!');
-      if (users[usuario].isAdmin) exibirAdminView();
+
+      localStorage.setItem(chave, JSON.stringify(checklist));
+      alert("Checklist enviado com sucesso!");
+      location.reload();
     }
 
     function exibirAdminView() {
@@ -135,25 +157,26 @@
       const table = document.createElement('table');
       table.innerHTML = `
         <thead>
-          <tr><th>Usuário</th><th>Moto</th><th>Data e Hora</th><th>Itens Marcados</th></tr>
+          <tr><th>Usuário</th><th>Moto</th><th>Data</th><th>Hora</th><th>Itens Marcados</th></tr>
         </thead>
         <tbody></tbody>
       `;
 
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('checklist_')) {
-          const { usuario, moto, dataHora, selecionados } = JSON.parse(localStorage.getItem(key));
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${usuario}</td>
-            <td>${moto}</td>
-            <td>${dataHora}</td>
-            <td>${selecionados.join(', ')}</td>
-          `;
-          table.querySelector('tbody').appendChild(row);
-        }
-      }
+      const chaves = Object.keys(localStorage).filter(k => k.startsWith('checklist_'));
+      chaves.sort(); // ordena
+
+      chaves.forEach(chave => {
+        const { usuario, moto, data, hora, selecionados } = JSON.parse(localStorage.getItem(chave));
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${usuario}</td>
+          <td>${moto}</td>
+          <td>${data}</td>
+          <td>${hora}</td>
+          <td>${selecionados.join(', ')}</td>
+        `;
+        table.querySelector('tbody').appendChild(row);
+      });
 
       adminDiv.appendChild(table);
     }
