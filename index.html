@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Checklist de Motos</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f2f2f2; }
-    .container { max-width: 400px; margin: 50px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .container { max-width: 600px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     h2, h3 { text-align: center; }
     input[type="text"], input[type="password"], select { width: 100%; padding: 10px; margin: 10px 0; }
-    button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
     button:hover { background: #218838; }
     .hidden { display: none; }
     .checklist label { display: block; margin: 5px 0; }
-    #logoutBtn { background: #dc3545; margin-top: 10px; }
+    #logoutBtn { background: #dc3545; }
     #logoutBtn:hover { background: #c82333; }
-    @media (max-width: 500px) {
-      .container { margin: 20px; }
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; font-size: 14px; }
+    th { background-color: #f2f2f2; }
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -26,108 +26,136 @@
     <input type="text" id="username" placeholder="Usuário" />
     <input type="password" id="password" placeholder="Senha" />
     <button onclick="login()">Entrar</button>
-  </div>
-
-  <div class="container hidden" id="checklistContainer">
-    <h2>Checklist - Moto 1 e 2</h2>
+  </div>  <div class="container hidden" id="checklistContainer">
+    <h2>Checklist de Motos</h2>
     <div id="userHeader"></div>
     <form id="checklistForm">
-      <label><input type="checkbox" name="moto1" value="óleo" /> Óleo - Moto 1</label>
-      <label><input type="checkbox" name="moto1" value="freios" /> Freios - Moto 1</label>
-      <label><input type="checkbox" name="moto2" value="óleo" /> Óleo - Moto 2</label>
-      <label><input type="checkbox" name="moto2" value="freios" /> Freios - Moto 2</label>
+      <h3>Moto 1 e 2</h3>
+      <label><input type="checkbox" value="Óleo - Moto 1"> Óleo - Moto 1</label>
+      <label><input type="checkbox" value="Freios - Moto 1"> Freios - Moto 1</label>
+      <label><input type="checkbox" value="Óleo - Moto 2"> Óleo - Moto 2</label>
+      <label><input type="checkbox" value="Freios - Moto 2"> Freios - Moto 2</label><h3>Checklist Geral - Pop 110</h3>
+  <label><input type="checkbox" value="Óleo do motor"> Óleo do motor</label>
+  <label><input type="checkbox" value="Pneu dianteiro"> Pneu dianteiro</label>
+  <label><input type="checkbox" value="Pneu traseiro"> Pneu traseiro</label>
+  <label><input type="checkbox" value="Sistema de freios"> Sistema de freios</label>
+  <label><input type="checkbox" value="Corrente de transmissão"> Corrente de transmissão</label>
+  <label><input type="checkbox" value="Luzes"> Luzes</label>
+  <label><input type="checkbox" value="Buzina"> Buzina</label>
+  <label><input type="checkbox" value="Retrovisores"> Retrovisores</label>
+  <label><input type="checkbox" value="Painel de instrumentos"> Painel de instrumentos</label>
+  <label><input type="checkbox" value="Suspensão"> Suspensão</label>
+  <label><input type="checkbox" value="Nível de combustível"> Nível de combustível</label>
 
-      <h3>Checklist Geral - Pop 110</h3>
-      <label><input type="checkbox" name="pop110" value="óleo_motor" /> Óleo do motor</label>
-      <label><input type="checkbox" name="pop110" value="pneu_dianteiro" /> Pneu dianteiro</label>
-      <label><input type="checkbox" name="pop110" value="pneu_traseiro" /> Pneu traseiro</label>
-      <label><input type="checkbox" name="pop110" value="freios" /> Sistema de freios</label>
-      <label><input type="checkbox" name="pop110" value="corrente" /> Corrente de transmissão</label>
-      <label><input type="checkbox" name="pop110" value="luzes" /> Luzes (farol, lanterna, setas)</label>
-      <label><input type="checkbox" name="pop110" value="buzina" /> Buzina</label>
-      <label><input type="checkbox" name="pop110" value="retrovisores" /> Retrovisores</label>
-      <label><input type="checkbox" name="pop110" value="painel" /> Painel de instrumentos</label>
+  <button type="submit">Salvar Checklist</button>
+</form>
+<button onclick="mostrarHistorico()">Ver Histórico</button>
+<button id="logoutBtn" onclick="logout()">Sair</button>
 
-      <h3>Novos Itens</h3>
-      <label><input type="checkbox" name="pop110" value="suspensao" /> Suspensão</label>
-      <label><input type="checkbox" name="pop110" value="nivel_combustivel" /> Nível de combustível</label>
-
-      <button type="submit">Salvar Checklist</button>
-      <button type="button" onclick="exportarPDF()">Exportar para PDF</button>
-    </form>
-    <button id="logoutBtn" onclick="logout()">Sair</button>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
+  </div>  <div class="container hidden" id="historicoContainer">
+    <h2>Histórico de Checklists</h2>
+    <div class="filters">
+      <select id="filtroUsuario">
+        <option value="">Todos os Usuários</option>
+      </select>
+      <input type="date" id="filtroData" />
+    </div>
+    <table id="tabelaHistorico">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Data e Hora</th>
+          <th>Itens Marcados</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button onclick="voltarParaChecklist()">Voltar</button>
+  </div>  <script>
     const users = {
       'admin': { password: 'admin123', isAdmin: true },
-      'user1': { password: 'senha123', isAdmin: false },
-      'user2': { password: 'senha456', isAdmin: false }
+      'Iuri': { password: 'SBiuri', isAdmin: false },
+      'Caique': { password: 'SBcaique', isAdmin: false },
+      'Riquelme': { password: 'SBriquelme', isAdmin: false },
+      'Leonardo': { password: 'SBleonardo', isAdmin: false }
     };
+
+    let currentUser = null;
 
     function login() {
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
-
-      if (users[username] && users[username].password === password) {
-        localStorage.setItem('loggedUser', username);
-        mostrarChecklist(username);
+      const user = users[username];
+      if (user && user.password === password) {
+        currentUser = username;
+        document.getElementById('loginContainer').classList.add('hidden');
+        document.getElementById('checklistContainer').classList.remove('hidden');
+        document.getElementById('userHeader').innerText = user.isAdmin ? `Admin: ${username}` : `Usuário: ${username}`;
+        if (user.isAdmin) carregarFiltroUsuarios();
       } else {
-        alert('Usuário ou senha inválidos!');
-      }
-    }
-
-    function mostrarChecklist(username) {
-      document.getElementById('loginContainer').classList.add('hidden');
-      document.getElementById('checklistContainer').classList.remove('hidden');
-      const isAdmin = users[username].isAdmin;
-      document.getElementById('userHeader').innerText = isAdmin ? `Admin: ${username}` : `Usuário: ${username}`;
-
-      if (isAdmin) {
-        document.getElementById('checklistForm').innerHTML += '<p style="margin-top:10px;color:blue;">Você pode revisar os checklists dos usuários.</p>';
+        alert('Usuário ou senha incorretos');
       }
     }
 
     function logout() {
-      localStorage.removeItem('loggedUser');
+      currentUser = null;
       document.getElementById('loginContainer').classList.remove('hidden');
       document.getElementById('checklistContainer').classList.add('hidden');
+      document.getElementById('historicoContainer').classList.add('hidden');
     }
 
     document.getElementById('checklistForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const data = new FormData(this);
-      const checklist = {};
-      for (let [key, value] of data.entries()) {
-        if (!checklist[key]) checklist[key] = [];
-        checklist[key].push(value);
-      }
-      const user = localStorage.getItem('loggedUser');
-      localStorage.setItem(`checklist_${user}`, JSON.stringify(checklist));
+      const dataHora = new Date().toISOString().replace('T', ' ').substring(0, 16);
+      const itens = Array.from(document.querySelectorAll('#checklistForm input[type=checkbox]:checked')).map(el => el.value);
+      const registro = { usuario: currentUser, dataHora, itens };
+      const historico = JSON.parse(localStorage.getItem('checklistData')) || [];
+      historico.push(registro);
+      localStorage.setItem('checklistData', JSON.stringify(historico));
       alert('Checklist salvo com sucesso!');
+      document.getElementById('checklistForm').reset();
     });
 
-    function exportarPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const checks = document.querySelectorAll('#checklistForm input[type=checkbox]');
-      let y = 10;
-      doc.text("Checklist da Moto", 10, y);
-      y += 10;
-      checks.forEach(check => {
-        if (check.checked) {
-          doc.text(`✔ ${check.parentElement.textContent.trim()}`, 10, y);
-          y += 8;
-        }
-      });
-      doc.save("checklist_moto.pdf");
+    function mostrarHistorico() {
+      document.getElementById('checklistContainer').classList.add('hidden');
+      document.getElementById('historicoContainer').classList.remove('hidden');
+      atualizarTabela();
     }
 
-    window.onload = () => {
-      const user = localStorage.getItem('loggedUser');
-      if (user) mostrarChecklist(user);
-    };
-  </script>
-</body>
+    function voltarParaChecklist() {
+      document.getElementById('checklistContainer').classList.remove('hidden');
+      document.getElementById('historicoContainer').classList.add('hidden');
+    }
+
+    function carregarFiltroUsuarios() {
+      const select = document.getElementById('filtroUsuario');
+      Object.keys(users).forEach(user => {
+        if (!users[user].isAdmin) {
+          const opt = document.createElement('option');
+          opt.value = user;
+          opt.textContent = user;
+          select.appendChild(opt);
+        }
+      });
+      document.getElementById('filtroUsuario').addEventListener('change', atualizarTabela);
+      document.getElementById('filtroData').addEventListener('input', atualizarTabela);
+    }
+
+    function atualizarTabela() {
+      const tbody = document.querySelector('#tabelaHistorico tbody');
+      tbody.innerHTML = '';
+      const filtroUsuario = document.getElementById('filtroUsuario').value;
+      const filtroData = document.getElementById('filtroData').value;
+      const historico = JSON.parse(localStorage.getItem('checklistData')) || [];
+      const filtrado = historico.filter(reg => {
+        return (!filtroUsuario || reg.usuario === filtroUsuario) &&
+               (!filtroData || reg.dataHora.startsWith(filtroData));
+      });
+      filtrado.forEach(reg => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${reg.usuario}</td><td>${reg.dataHora}</td><td>${reg.itens.join(', ')}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+  </script></body>
 </html>
