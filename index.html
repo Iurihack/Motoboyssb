@@ -6,15 +6,16 @@
   <title>Checklist de Motos</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f2f2f2; }
-    .container { max-width: 500px; margin: 50px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .container { max-width: 600px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     h2, h3 { text-align: center; }
-    input, button, label, select { width: 100%; margin: 5px 0; padding: 10px; }
+    input, select, button, label { width: 100%; margin: 5px 0; padding: 10px; }
     button { background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
     button:hover { background: #218838; }
     .hidden { display: none; }
+    .radio-group { display: flex; justify-content: space-around; margin-bottom: 10px; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #eee; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #e0e0e0; }
   </style>
 </head>
 <body>
@@ -33,9 +34,9 @@
       <option value="Moto 2">Moto 2</option>
     </select>
     <label>Data:</label>
-    <input type="date" id="dataChecklist" required />
+    <input type="date" id="dataChecklist" />
     <label>Hora:</label>
-    <input type="time" id="horaChecklist" required />
+    <input type="time" id="horaChecklist" />
     <button onclick="confirmarMoto()">Confirmar</button>
   </div>
 
@@ -43,18 +44,14 @@
     <h2>Checklist - Pop 110</h2>
     <div id="userHeader"></div>
     <form id="checklistForm">
-      <label><input type="checkbox" value="óleo_motor" /> Óleo do motor</label>
-      <label><input type="checkbox" value="pneu_dianteiro" /> Pneu dianteiro</label>
-      <label><input type="checkbox" value="pneu_traseiro" /> Pneu traseiro</label>
-      <label><input type="checkbox" value="freios" /> Sistema de freios</label>
-      <label><input type="checkbox" value="corrente" /> Corrente de transmissão</label>
-      <label><input type="checkbox" value="luzes" /> Luzes (farol, lanterna, setas)</label>
-      <label><input type="checkbox" value="buzina" /> Buzina</label>
-      <label><input type="checkbox" value="retrovisores" /> Retrovisores</label>
-      <label><input type="checkbox" value="painel" /> Painel de instrumentos</label>
+      <div id="itensChecklist"></div>
       <button type="submit">Salvar Checklist</button>
     </form>
-    <div id="adminView" class="hidden"></div>
+  </div>
+
+  <div class="container hidden" id="adminContainer">
+    <h2>Admin - Histórico de Checklists</h2>
+    <div id="adminTable"></div>
   </div>
 
   <script>
@@ -66,10 +63,13 @@
       'leonardo': { password: 'sbleonardo', isAdmin: false }
     };
 
-    let usuarioLogado = "";
-    let motoSelecionada = "";
-    let dataSelecionada = "";
-    let horaSelecionada = "";
+    const checklistItens = [
+      "Óleo do motor", "Pneu dianteiro", "Pneu traseiro", "Sistema de freios",
+      "Corrente de transmissão", "Luzes (farol, lanterna, setas)",
+      "Buzina", "Retrovisores", "Painel de instrumentos"
+    ];
+
+    let usuarioLogado = "", motoSelecionada = "", dataSelecionada = "", horaSelecionada = "";
 
     function login() {
       const username = document.getElementById('username').value.trim().toLowerCase();
@@ -80,11 +80,10 @@
         document.getElementById('loginContainer').classList.add('hidden');
 
         if (users[username].isAdmin) {
-          document.getElementById('checklistContainer').classList.remove('hidden');
-          document.getElementById('userHeader').innerText = `Admin: ${usuarioLogado}`;
-          exibirAdminView();
+          document.getElementById('adminContainer').classList.remove('hidden');
+          exibirHistoricoAdmin();
         } else {
-          if (verificarChecklistEnviadoHoje(usuarioLogado)) {
+          if (checklistEnviadoHoje(username)) {
             alert("Você já enviou o checklist hoje. Tente novamente amanhã.");
             location.reload();
             return;
@@ -92,22 +91,16 @@
           document.getElementById('motoSelectContainer').classList.remove('hidden');
         }
       } else {
-        alert('Usuário ou senha inválidos!');
+        alert("Usuário ou senha inválidos.");
       }
     }
 
-    function verificarChecklistEnviadoHoje(usuario) {
+    function checklistEnviadoHoje(usuario) {
       const hoje = new Date().toISOString().split("T")[0];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('checklist_')) {
-          const item = JSON.parse(localStorage.getItem(key));
-          if (item.usuario === usuario && item.data === hoje) {
-            return true;
-          }
-        }
-      }
-      return false;
+      return Object.keys(localStorage).some(key => {
+        const item = JSON.parse(localStorage.getItem(key));
+        return key.startsWith('checklist_') && item.usuario === usuario && item.data === hoje;
+      });
     }
 
     function confirmarMoto() {
@@ -116,7 +109,7 @@
       horaSelecionada = document.getElementById('horaChecklist').value;
 
       if (!motoSelecionada || !dataSelecionada || !horaSelecionada) {
-        alert("Preencha todos os campos antes de continuar.");
+        alert("Preencha todos os campos.");
         return;
       }
 
@@ -124,25 +117,43 @@
       document.getElementById('checklistContainer').classList.remove('hidden');
       document.getElementById('userHeader').innerText = `Usuário: ${usuarioLogado} - ${motoSelecionada} - ${dataSelecionada} ${horaSelecionada}`;
 
+      const checklistDiv = document.getElementById('itensChecklist');
+      checklistDiv.innerHTML = "";
+      checklistItens.forEach(item => {
+        checklistDiv.innerHTML += `
+          <label>${item}</label>
+          <div class="radio-group">
+            <label><input type="radio" name="${item}" value="Sim" required> Sim</label>
+            <label><input type="radio" name="${item}" value="Não"> Não</label>
+          </div>
+        `;
+      });
+
       document.getElementById('checklistForm').onsubmit = function(e) {
         e.preventDefault();
-        salvarChecklist(usuarioLogado, motoSelecionada, dataSelecionada, horaSelecionada);
+        salvarChecklist();
       };
     }
 
-    function salvarChecklist(usuario, moto, data, hora) {
-      const checkboxes = document.querySelectorAll('#checklistForm input[type="checkbox"]');
-      const selecionados = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-      const dataHora = `${data} ${hora}`;
-      const chave = `checklist_${usuario}_${data}`;
+    function salvarChecklist() {
+      const respostas = {};
+      checklistItens.forEach(item => {
+        const radios = document.getElementsByName(item);
+        for (let r of radios) {
+          if (r.checked) {
+            respostas[item] = r.value;
+            break;
+          }
+        }
+      });
 
+      const chave = `checklist_${usuarioLogado}_${dataSelecionada}`;
       const checklist = {
-        usuario,
-        moto,
-        data,
-        hora,
-        dataHora,
-        selecionados
+        usuario: usuarioLogado,
+        moto: motoSelecionada,
+        data: dataSelecionada,
+        hora: horaSelecionada,
+        respostas: respostas
       };
 
       localStorage.setItem(chave, JSON.stringify(checklist));
@@ -150,35 +161,31 @@
       location.reload();
     }
 
-    function exibirAdminView() {
-      const adminDiv = document.getElementById('adminView');
-      adminDiv.classList.remove('hidden');
-      adminDiv.innerHTML = '<h3>Histórico de Checklists</h3>';
-      const table = document.createElement('table');
-      table.innerHTML = `
+    function exibirHistoricoAdmin() {
+      const tabela = document.createElement('table');
+      tabela.innerHTML = `
         <thead>
-          <tr><th>Usuário</th><th>Moto</th><th>Data</th><th>Hora</th><th>Itens Marcados</th></tr>
+          <tr><th>Usuário</th><th>Moto</th><th>Data</th><th>Hora</th><th>Respostas</th></tr>
         </thead>
         <tbody></tbody>
       `;
 
-      const chaves = Object.keys(localStorage).filter(k => k.startsWith('checklist_'));
-      chaves.sort(); // ordena
-
-      chaves.forEach(chave => {
-        const { usuario, moto, data, hora, selecionados } = JSON.parse(localStorage.getItem(chave));
+      Object.keys(localStorage).filter(k => k.startsWith('checklist_')).forEach(key => {
+        const { usuario, moto, data, hora, respostas } = JSON.parse(localStorage.getItem(key));
+        const respostaStr = checklistItens.map(item => `${item}: ${respostas[item]}`).join("<br>");
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${usuario}</td>
           <td>${moto}</td>
           <td>${data}</td>
           <td>${hora}</td>
-          <td>${selecionados.join(', ')}</td>
+          <td style="text-align:left">${respostaStr}</td>
         `;
-        table.querySelector('tbody').appendChild(row);
+        tabela.querySelector('tbody').appendChild(row);
       });
 
-      adminDiv.appendChild(table);
+      document.getElementById('adminTable').innerHTML = "";
+      document.getElementById('adminTable').appendChild(tabela);
     }
   </script>
 </body>
