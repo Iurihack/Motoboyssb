@@ -1,46 +1,37 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const bodyParser = require('body-parser');
 const app = express();
 const PORT = 3000;
 
+// Permitir POST com JSON
+app.use(express.json());
+
+// Servir os arquivos HTML
 app.use(express.static(__dirname));
-app.use(bodyParser.json());
 
-const users = {
-  "admin": "adminsb",
-  "Caique": "caiquesb",
-  "Iuri": "iurisb",
-  "Riquelme": "riquelmesb",
-  "Leonardo": "leonardosb"
-};
+// Caminho do arquivo
+const filePath = path.join(__dirname, 'logui2.txt');
 
-let submissions = {};
-
+// Rota para receber o checklist
 app.post('/checklist', (req, res) => {
   const { usuario, senha, moto, data, hora, checklist } = req.body;
 
-  if (!users[usuario] || users[usuario] !== senha) {
-    return res.status(401).json({ message: 'Usuário ou senha inválidos.' });
-  }
+  // Verificar se o usuário já enviou hoje
+  const today = new Date().toISOString().split('T')[0];
+  const entry = `[${data} ${hora}] ${usuario.toUpperCase()} - ${moto}\n${checklist.join('\n')}\n\n`;
 
-  const key = `${usuario}-${data}`;
-  if (submissions[key] && usuario !== "admin") {
-    return res.status(400).json({ message: 'Checklist já enviado hoje.' });
-  }
-
-  if (usuario !== "admin") submissions[key] = true;
-
-  const texto = `Usuário: ${usuario}\nMoto: ${moto}\nData: ${data}\nHora: ${hora}\n\nChecklist:\n${checklist.join('\n')}\n\n---\n`;
-
-  const filePath = path.join(__dirname, 'logui2.txt');
-  fs.appendFile(filePath, texto, (err) => {
-    if (err) return res.status(500).json({ message: 'Erro ao salvar checklist.' });
-    res.json({ message: 'Checklist salvo com sucesso!' });
+  // Adiciona a entrada ao arquivo
+  fs.appendFile(filePath, entry, (err) => {
+    if (err) {
+      console.error('Erro ao salvar checklist:', err);
+      return res.status(500).json({ message: 'Erro ao salvar checklist.' });
+    }
+    res.json({ message: 'Checklist enviado com sucesso!' });
   });
 });
 
+// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
