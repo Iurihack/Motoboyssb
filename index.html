@@ -1,5 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Checklist Pop 110</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="login">
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Usuário"><br>
+  <input type="password" id="password" placeholder="Senha"><br><br>
+  <button onclick="login()">Entrar</button>
+</div>
+
+<div id="formulario" class="hidden">
+  <h2>Checklist Pop 110</h2>
+  <label>Moto:</label>
+  <select id="motoSelect">
+    <option value="Moto 1">Moto 1</option>
+    <option value="Moto 2">Moto 2</option>
+  </select><br><br>
+  <label>Data:</label>
+  <input type="date" id="data"><br><br>
+  <label>Hora:</label>
+  <input type="time" id="hora"><br><br>
+
+  <form id="checklistForm">
+    <div id="checklistItems"></div><br>
+    <button type="submit">Enviar</button>
+  </form>
+</div>
+
 <script>
-const checklistItems = [ /* ... os itens */ ];
+const checklistItems = [
+  "Freio dianteiro", "Freio traseiro", "Pneus", "Farol", "Setas", 
+  "Retrovisores", "Motor", "Corrente", "Transmissão", "Painel",
+  "Combustível", "Buzina", "Suspensão dianteira", "Suspensão traseira",
+  "Óleo", "Chassi", "Banco", "Cavalete", "Documentação", "Chave reserva"
+];
+
 let currentUser = '';
 let currentPassword = '';
 
@@ -76,3 +119,6 @@ function buildChecklist() {
   });
 }
 </script>
+
+</body>
+</html>
