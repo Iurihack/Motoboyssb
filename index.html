@@ -26,6 +26,16 @@
     <button onclick="login()">Entrar</button>
   </div>
 
+  <div class="container hidden" id="motoSelectContainer">
+    <h2>Qual moto você está utilizando?</h2>
+    <select id="motoSelecionada">
+      <option value="">Selecione</option>
+      <option value="Moto 1">Moto 1</option>
+      <option value="Moto 2">Moto 2</option>
+    </select>
+    <button onclick="confirmarMoto()">Confirmar</button>
+  </div>
+
   <div class="container hidden" id="checklistContainer">
     <h2>Checklist de Motos</h2>
     <div id="userHeader"></div>
@@ -60,34 +70,55 @@
       'leonardo': { password: 'sbleonardo', isAdmin: false }
     };
 
+    let usuarioLogado = "";
+    let motoSelecionada = "";
+
     function login() {
-      const username = document.getElementById('username').value.trim().toLowerCase();
-      const password = document.getElementById('password').value.trim().toLowerCase();
+      const usernameInput = document.getElementById('username').value.trim().toLowerCase();
+      const passwordInput = document.getElementById('password').value.trim().toLowerCase();
 
-      if (users[username] && users[username].password === password) {
+      if (users[usernameInput] && users[usernameInput].password === passwordInput) {
+        usuarioLogado = usernameInput;
         document.getElementById('loginContainer').classList.add('hidden');
-        document.getElementById('checklistContainer').classList.remove('hidden');
-        document.getElementById('userHeader').innerText = users[username].isAdmin ? `Admin: ${username}` : `Usuário: ${username}`;
 
-        if (users[username].isAdmin) {
+        if (users[usernameInput].isAdmin) {
+          document.getElementById('checklistContainer').classList.remove('hidden');
+          document.getElementById('userHeader').innerText = `Admin: ${usuarioLogado}`;
           exibirAdminView();
+        } else {
+          document.getElementById('motoSelectContainer').classList.remove('hidden');
         }
-
-        document.getElementById('checklistForm').onsubmit = function (e) {
-          e.preventDefault();
-          salvarChecklist(username);
-        };
       } else {
         alert('Usuário ou senha inválidos!');
       }
     }
 
-    function salvarChecklist(usuario) {
+    function confirmarMoto() {
+      const select = document.getElementById('motoSelecionada');
+      motoSelecionada = select.value;
+
+      if (!motoSelecionada) {
+        alert('Selecione uma moto antes de continuar.');
+        return;
+      }
+
+      document.getElementById('motoSelectContainer').classList.add('hidden');
+      document.getElementById('checklistContainer').classList.remove('hidden');
+      document.getElementById('userHeader').innerText = `Usuário: ${usuarioLogado} - ${motoSelecionada}`;
+
+      document.getElementById('checklistForm').onsubmit = function(e) {
+        e.preventDefault();
+        salvarChecklist(usuarioLogado, motoSelecionada);
+      };
+    }
+
+    function salvarChecklist(usuario, moto) {
       const checkboxes = document.querySelectorAll('#checklistForm input[type="checkbox"]');
       const selecionados = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
       const agora = new Date();
       const data = {
         usuario,
+        moto,
         selecionados,
         dataHora: agora.toLocaleString()
       };
@@ -104,7 +135,7 @@
       const table = document.createElement('table');
       table.innerHTML = `
         <thead>
-          <tr><th>Usuário</th><th>Data e Hora</th><th>Itens Marcados</th></tr>
+          <tr><th>Usuário</th><th>Moto</th><th>Data e Hora</th><th>Itens Marcados</th></tr>
         </thead>
         <tbody></tbody>
       `;
@@ -112,10 +143,11 @@
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key.startsWith('checklist_')) {
-          const { usuario, dataHora, selecionados } = JSON.parse(localStorage.getItem(key));
+          const { usuario, moto, dataHora, selecionados } = JSON.parse(localStorage.getItem(key));
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${usuario}</td>
+            <td>${moto}</td>
             <td>${dataHora}</td>
             <td>${selecionados.join(', ')}</td>
           `;
