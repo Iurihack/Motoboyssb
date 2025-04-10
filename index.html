@@ -7,12 +7,17 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f2f2f2; }
     .container { max-width: 400px; margin: 50px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    h2 { text-align: center; }
+    h2, h3 { text-align: center; }
     input[type="text"], input[type="password"], select { width: 100%; padding: 10px; margin: 10px 0; }
     button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
     button:hover { background: #218838; }
     .hidden { display: none; }
     .checklist label { display: block; margin: 5px 0; }
+    #logoutBtn { background: #dc3545; margin-top: 10px; }
+    #logoutBtn:hover { background: #c82333; }
+    @media (max-width: 500px) {
+      .container { margin: 20px; }
+    }
   </style>
 </head>
 <body>
@@ -43,10 +48,17 @@
       <label><input type="checkbox" name="pop110" value="retrovisores" /> Retrovisores</label>
       <label><input type="checkbox" name="pop110" value="painel" /> Painel de instrumentos</label>
 
+      <h3>Novos Itens</h3>
+      <label><input type="checkbox" name="pop110" value="suspensao" /> Suspensão</label>
+      <label><input type="checkbox" name="pop110" value="nivel_combustivel" /> Nível de combustível</label>
+
       <button type="submit">Salvar Checklist</button>
+      <button type="button" onclick="exportarPDF()">Exportar para PDF</button>
     </form>
+    <button id="logoutBtn" onclick="logout()">Sair</button>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const users = {
       'admin': { password: 'admin123', isAdmin: true },
@@ -59,23 +71,63 @@
       const password = document.getElementById('password').value;
 
       if (users[username] && users[username].password === password) {
-        document.getElementById('loginContainer').classList.add('hidden');
-        document.getElementById('checklistContainer').classList.remove('hidden');
-        document.getElementById('userHeader').innerText = users[username].isAdmin ? `Admin: ${username}` : `Usuário: ${username}`;
-
-        if (users[username].isAdmin) {
-          document.getElementById('checklistForm').innerHTML += '<p style="margin-top:10px;color:blue;">Você pode revisar os checklists dos usuários.</p>';
-        }
+        localStorage.setItem('loggedUser', username);
+        mostrarChecklist(username);
       } else {
         alert('Usuário ou senha inválidos!');
       }
     }
 
+    function mostrarChecklist(username) {
+      document.getElementById('loginContainer').classList.add('hidden');
+      document.getElementById('checklistContainer').classList.remove('hidden');
+      const isAdmin = users[username].isAdmin;
+      document.getElementById('userHeader').innerText = isAdmin ? `Admin: ${username}` : `Usuário: ${username}`;
+
+      if (isAdmin) {
+        document.getElementById('checklistForm').innerHTML += '<p style="margin-top:10px;color:blue;">Você pode revisar os checklists dos usuários.</p>';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('loggedUser');
+      document.getElementById('loginContainer').classList.remove('hidden');
+      document.getElementById('checklistContainer').classList.add('hidden');
+    }
+
     document.getElementById('checklistForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      const data = new FormData(this);
+      const checklist = {};
+      for (let [key, value] of data.entries()) {
+        if (!checklist[key]) checklist[key] = [];
+        checklist[key].push(value);
+      }
+      const user = localStorage.getItem('loggedUser');
+      localStorage.setItem(`checklist_${user}`, JSON.stringify(checklist));
       alert('Checklist salvo com sucesso!');
-      // Aqui você pode adicionar lógica para salvar os dados em localStorage ou backend
     });
+
+    function exportarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const checks = document.querySelectorAll('#checklistForm input[type=checkbox]');
+      let y = 10;
+      doc.text("Checklist da Moto", 10, y);
+      y += 10;
+      checks.forEach(check => {
+        if (check.checked) {
+          doc.text(`✔ ${check.parentElement.textContent.trim()}`, 10, y);
+          y += 8;
+        }
+      });
+      doc.save("checklist_moto.pdf");
+    }
+
+    window.onload = () => {
+      const user = localStorage.getItem('loggedUser');
+      if (user) mostrarChecklist(user);
+    };
   </script>
 </body>
 </html>
