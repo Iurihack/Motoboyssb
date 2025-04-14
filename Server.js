@@ -1,37 +1,63 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const fs = require('fs');
-const path = require('path');
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
-// Permitir POST com JSON
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(express.static('public'));
 
-// Servir os arquivos HTML
-app.use(express.static(__dirname));
+// Usuários e senhas simples
+const users = {
+  "caiquesb": "caiquesb",
+  "iurisb": "iurisb",
+  "riquelmesb": "riquelmesb",
+  "leonardosb": "leonardosb",
+  "adminsb": "adminsb"
+};
 
-// Caminho do arquivo
-const filePath = path.join(__dirname, 'logui2.txt');
+// Dados dos checklists (em memória, você pode salvar em um arquivo ou banco real depois)
+let checklists = {};
 
-// Rota para receber o checklist
-app.post('/checklist', (req, res) => {
-  const { usuario, senha, moto, data, hora, checklist } = req.body;
+// Carregar dados dos checklists de um arquivo JSON
+fs.readFile('checklists.json', 'utf8', (err, data) => {
+  if (!err) checklists = JSON.parse(data);
+});
 
-  // Verificar se o usuário já enviou hoje
-  const today = new Date().toISOString().split('T')[0];
-  const entry = `[${data} ${hora}] ${usuario.toUpperCase()} - ${moto}\n${checklist.join('\n')}\n\n`;
+// Rota para login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
 
-  // Adiciona a entrada ao arquivo
-  fs.appendFile(filePath, entry, (err) => {
-    if (err) {
-      console.error('Erro ao salvar checklist:', err);
-      return res.status(500).json({ message: 'Erro ao salvar checklist.' });
-    }
-    res.json({ message: 'Checklist enviado com sucesso!' });
+  if (users[username] === password) {
+    return res.json({ success: true, user: username });
+  } else {
+    return res.json({ success: false, message: 'Usuário ou senha incorretos' });
+  }
+});
+
+// Rota para enviar checklist
+app.post('/submit-checklist', (req, res) => {
+  const { username, checklist } = req.body;
+
+  // Verifica se o usuário já enviou hoje
+  if (checklists[username] && checklists[username].date === new Date().toLocaleDateString()) {
+    return res.json({ success: false, message: 'Você já enviou o checklist hoje.' });
+  }
+
+  // Salva o checklist
+  checklists[username] = { checklist, date: new Date().toLocaleDateString() };
+  fs.writeFile('checklists.json', JSON.stringify(checklists, null, 2), (err) => {
+    if (err) return res.json({ success: false, message: 'Erro ao salvar o checklist' });
+    return res.json({ success: true, message: 'Checklist enviado com sucesso!' });
   });
 });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+// Rota para obter todos os checklists (admin)
+app.get('/admin/checklists', (req, res) => {
+  res.json(checklists);
+});
+
+// Inicia o servidor
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
 });
