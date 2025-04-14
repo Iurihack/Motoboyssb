@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist POP 110</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="checklist-container">
+    <h2>Checklist de Motos POP 110</h2>
+    <form id="checklist-form">
+      <label>
+        Nível de óleo:
+        <input type="radio" name="oil" value="Sim" required> Sim
+        <input type="radio" name="oil" value="Não"> Não
+      </label>
+      <label>
+        Pneu dianteiro/traseiro:
+        <input type="radio" name="tires" value="Sim" required> Sim
+        <input type="radio" name="tires" value="Não"> Não
+      </label>
+      <!-- Adicione os outros itens do checklist aqui -->
+      <button type="submit">Enviar Checklist</button>
+    </form>
+    <div id="result"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
