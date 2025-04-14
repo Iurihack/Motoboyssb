@@ -2,203 +2,21 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Checklist Pop 110</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      max-width: 700px;
-      margin: auto;
-    }
-
-    input, button, select {
-      font-size: 20px;
-      padding: 12px;
-      margin: 8px 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    label {
-      font-size: 20px;
-      margin-top: 10px;
-      display: block;
-    }
-
-    button {
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .btn {
-      width: 48%;
-      margin: 5px 1%;
-    }
-
-    .yes { background-color: #28a745; color: white; }
-    .no { background-color: #dc3545; color: white; }
-
-    h2 { font-size: 28px; margin-bottom: 20px; }
-    .hidden { display: none; }
-    .selected { box-shadow: 0 0 5px 3px #444 inset; }
-
-    .item-group {
-      margin: 15px 0;
-    }
-
-    pre {
-      background: #f4f4f4;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Checklist POP 110</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="login-form">
+      <input type="text" id="username" placeholder="Usuário" required>
+      <input type="password" id="password" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="error-message"></div>
+  </div>
 
-<div id="login">
-  <h2>Login</h2>
-  <input type="text" id="username" placeholder="Usuário">
-  <input type="password" id="password" placeholder="Senha">
-  <button onclick="login()">Entrar</button>
-</div>
-
-<div id="formulario" class="hidden">
-  <h2>Checklist Pop 110</h2>
-
-  <label>Moto:</label>
-  <select id="motoSelect">
-    <option value="Moto 1">Moto 1</option>
-    <option value="Moto 2">Moto 2</option>
-  </select>
-
-  <label>Data:</label>
-  <input type="date" id="data">
-
-  <label>Hora:</label>
-  <input type="time" id="hora">
-
-  <form id="checklistForm">
-    <div id="checklistItems"></div>
-    <button type="submit">Enviar Checklist</button>
-  </form>
-</div>
-
-<div id="adminView" class="hidden">
-  <h2>Relatórios Recebidos</h2>
-  <pre id="adminData">Carregando dados...</pre>
-</div>
-
-<script>
-const checklistItems = [
-  "Freio dianteiro", "Freio traseiro", "Pneus", "Farol", "Setas", 
-  "Retrovisores", "Motor", "Corrente", "Transmissão", "Painel",
-  "Combustível", "Buzina", "Suspensão dianteira", "Suspensão traseira",
-  "Óleo", "Chassi", "Banco", "Cavalete", "Documentação", "Chave reserva"
-];
-
-let currentUser = '';
-let currentPassword = '';
-let checklistData = {};
-
-function login() {
-  const user = document.getElementById('username').value;
-  const pass = document.getElementById('password').value;
-
-  if (!user || !pass) {
-    alert("Preencha usuário e senha");
-    return;
-  }
-
-  currentUser = user;
-  currentPassword = pass;
-
-  if (user.toLowerCase() === 'admin') {
-    document.getElementById('login').classList.add('hidden');
-    document.getElementById('adminView').classList.remove('hidden');
-    fetch('/logui2.txt')
-      .then(res => res.text())
-      .then(text => {
-        document.getElementById('adminData').innerText = text;
-      })
-      .catch(() => {
-        document.getElementById('adminData').innerText = 'Erro ao carregar arquivo.';
-      });
-  } else {
-    document.getElementById('login').classList.add('hidden');
-    document.getElementById('formulario').classList.remove('hidden');
-    buildChecklist();
-  }
-}
-
-function buildChecklist() {
-  const container = document.getElementById('checklistItems');
-  container.innerHTML = '';
-
-  checklistItems.forEach(item => {
-    const group = document.createElement('div');
-    group.className = 'item-group';
-
-    group.innerHTML = `
-      <label>${item}:</label>
-      <div>
-        <button type="button" class="btn yes" onclick="selectOption('${item}', 'Sim', this)">Sim</button>
-        <button type="button" class="btn no" onclick="selectOption('${item}', 'Não', this)">Não</button>
-      </div>
-    `;
-    container.appendChild(group);
-  });
-
-  checklistData = {};
-}
-
-function selectOption(item, value, button) {
-  checklistData[item] = value;
-  const buttons = button.parentElement.querySelectorAll('button');
-  buttons.forEach(b => b.classList.remove('selected'));
-  button.classList.add('selected');
-}
-
-document.getElementById('checklistForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const moto = document.getElementById('motoSelect').value;
-  const data = document.getElementById('data').value;
-  const hora = document.getElementById('hora').value;
-
-  if (!data || !hora) {
-    alert("Preencha data e hora");
-    return;
-  }
-
-  const checklist = checklistItems.map(item => {
-    return `${item}: ${checklistData[item] || 'Não respondido'}`;
-  });
-
-  const body = {
-    usuario: currentUser,
-    senha: currentPassword,
-    moto,
-    data,
-    hora,
-    checklist
-  };
-
-  try {
-    const res = await fetch('/checklist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-
-    const result = await res.json();
-    alert(result.message);
-  } catch (err) {
-    alert('Erro ao enviar checklist.');
-  }
-});
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
